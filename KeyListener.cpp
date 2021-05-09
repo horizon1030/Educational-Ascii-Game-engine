@@ -1,45 +1,35 @@
-#include <thread>
-#include <iostream>
-#include <windows.h>
-#include <conio.h>
-#include < Winuser.h>
-class KeyLitener
+#include "KeyListense.hpp"
+KeyListener klc;
+
+bool KeyListener::keycheck(int key)
 {
-private:
-	bool flag[43] = { false };//A~Z 0~9 좌상우하 (화살표) shift ctrl alt enter 
-	bool klf = 1;//프로그램 종료시
-public:
-	bool keycheck(int key)
+	if (flag[key])//키입력을 받았는데 한번의 동작도 하지 않는 것을 방지하기 위함
 	{
-		if (flag[key])//키입력을 받았는데 한번의 동작도 하지 않는 것을 방지하기 위함
-		{
-			flag[key] = 0;
-			return 1;
-		}
-		else { return 0; }
+		flag[key] = 0;
+		return 1;
 	}
-	void keyinput(int key)
+	else { return 0; }
+}
+void KeyListener::keyinput(int key)
+{
+	flag[key] = 1;
+}
+void KeyListener::reset()//사용자 텍스트를 받는다던가 게임 시작 시점이라던가 이전 입력을 무시해야하는 상황에서 사용
+{
+	for (int i = 0; i < 43; i++)
 	{
-		flag[key] = 1;
+		flag[i] = false;
 	}
-	void reset()//사용자 텍스트를 받는다던가 게임 시작 시점이라던가 이전 입력을 무시해야하는 상황에서 사용
-	{
-		for (int i = 0; i < 43; i++)
-		{
-			flag[i] = false;
-		}
-	}
-	bool ReturnF()
-	{
-		return klf;
-	}
-	void exit()
-	{
-		klf = 0;
-	}
-};
-KeyLitener klc;
-void KeyLitenerThread()//
+}
+bool KeyListener::ReturnF()
+{
+	return klf;
+}
+void KeyListener::exit()
+{
+	klf = 0;
+}
+void KeyListenerThread()
 {
 	int i;
 	while (klc.ReturnF)
@@ -84,10 +74,10 @@ void KeyLitenerThread()//
 				klc.keyinput(i - 0x25 + 36);
 			}
 		}
+		if (GetAsyncKeyState(0x6C))//스페이스바
+		{
+			klc.keyinput(44);
+		}
 	}
-}
-int main()
-{
-	std::thread t(KeyLitenerThread);
-	t.join();
+
 }
